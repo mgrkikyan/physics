@@ -1,0 +1,26 @@
+name: Build PDF from Markdown
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y texlive-xetex texlive-fonts-recommended latexmk
+          curl -L https://github.com/jgm/pandoc/releases/download/3.1.1/pandoc-3.1.1-linux-amd64.tar.gz | tar xvz
+          export PATH=$(pwd)/bin:$PATH
+      - name: Convert MD to PDF
+        run: |
+          mkdir artifacts
+          pandoc README.md -o artifacts/output.pdf
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: PDF
+          path: artifacts/*
